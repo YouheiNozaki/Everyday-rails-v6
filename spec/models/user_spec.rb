@@ -25,6 +25,12 @@ RSpec.describe User, type: :model do
   end
   #メールアドレスがなければ無効な状態であること
   it "is invalid without a email address" do
+    user = User.new(email: nil)
+    user.valid?
+    expect(user.errors[:email]).to include("can't be blank")
+  end
+  #重複したメールアドレスなら無効な状態であること
+  it "is invalid with a duplicate email address" do
     User.create(
       first_name: "Joe",
       last_name: "Tester",
@@ -40,8 +46,13 @@ RSpec.describe User, type: :model do
     user.valid?
     expect(user.errors[:email]).to include("has already been taken")
   end
-  #重複したメールアドレスなら無効な状態であること
-  it "is invalid with a duplicate email address"
   #ユーザのフルネームを文字列として返すこと
-  it "returns a users full name as a string"
+  it "returns a users full name as a string" do
+    user = User.new(
+      first_name: "John",
+      last_name: "Doe",
+      email: "johndoe@example.com",
+    )
+    expect(user.name).to eq "John Doe"
+  end
 end

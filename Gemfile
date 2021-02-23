@@ -22,6 +22,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'spring-commands-rspec'
   gem 'web-console'
   gem 'listen'
   gem 'spring'

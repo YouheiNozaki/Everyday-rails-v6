@@ -5,7 +5,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-gem 'rails', '~> 6.0.0'
+gem 'rails', '~> 6.1.0'
 gem 'sqlite3'
 gem 'puma'
 gem 'sass-rails'
@@ -15,6 +15,7 @@ gem 'turbolinks'
 gem 'jbuilder'
 
 group :development, :test do
+  gem "rspec-rails"
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'capybara'
   gem 'selenium-webdriver'

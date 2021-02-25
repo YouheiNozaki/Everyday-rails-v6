@@ -39,7 +39,7 @@ RSpec.describe "Projects", type: :request do
       #正常にレスポンスを返すこと
       it "responds successfully returns a 200 response" do
         sign_in @user
-        get projects_url, params: { id: @project.id }
+        get project_url id: @project.id
         expect(response).to be_successful
       end
     end
@@ -53,7 +53,7 @@ RSpec.describe "Projects", type: :request do
       #ダッシュボードにリダイレクトすること
       it "redirects to the dashboard" do
         sign_in @user
-        get projects_url, params: { id: @project.id }
+        get project_url @project.id
         expect(response).to redirect_to root_path
       end
     end

@@ -39,7 +39,7 @@ RSpec.describe "Projects", type: :request do
       #正常にレスポンスを返すこと
       it "responds successfully returns a 200 response" do
         sign_in @user
-        get project_url @project.id
+        get projects_url, params: { id: @project.id }
         expect(response).to be_successful
       end
     end
@@ -53,6 +53,7 @@ RSpec.describe "Projects", type: :request do
       #ダッシュボードにリダイレクトすること
       it "redirects to the dashboard" do
         sign_in @user
+        # このパス指定のやり方がわからない
         get project_url @project.id
         expect(response).to redirect_to root_path
       end
@@ -89,6 +90,22 @@ RSpec.describe "Projects", type: :request do
         project_params = FactoryBot.attributes_for(:project)
         post projects_url, params: { project: project_params }
         expect(response).to redirect_to "/users/sign_in"
+      end
+    end
+  end
+  describe "#update" do
+    context "as an authorized user" do
+      before do
+        @user = FactoryBot.create(:user)
+        @project = FactoryBot.create(:project, owner: @user)
+      end
+
+      #プロジェクトを更新できること
+      it "updates a project" do
+        project_params = FactoryBot.attributes_for(:project, name: "New Project Name")
+        sign_in @user
+        patch project_url @project, params: { project: project_params }
+        expect(@project.reload.name).to eq "New Project Name"
       end
     end
   end

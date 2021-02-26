@@ -123,7 +123,6 @@ RSpec.describe "Projects", type: :request do
       #プロジェクトを更新できないこと
       it "does not update the project" do
         project_params = FactoryBot.attributes_for(:project, name: "New Name")
-        patch project_url @project, params: { project: project_params }
         sign_in @user
         patch project_url @project, params: { project: project_params }
         expect(@project.reload.name).to eq "Same Old Name"
@@ -136,6 +135,88 @@ RSpec.describe "Projects", type: :request do
         expect(response).to redirect_to root_path
       end
     end
-
+    #ゲストとして
+    context "as a guest" do
+      before do
+        @project = FactoryBot.create(:project)
+      end
+      #302レスポンスを返す
+      it "returns a 302 response" do
+        project_params = FactoryBot.attributes_for(:project)
+        patch project_url @project, params: { project: project_params }
+        expect(response).to have_http_status "302"
+      end
+      #サインイン画面にリダイレクトすること
+      it "redirects to the sign-in page" do
+        project_params = FactoryBot.attributes_for(:project)
+        patch project_url @project, params: { project: project_params }
+        expect(response).to redirect_to "/users/sign_in"
+      end
+    end
+  end
+  describe "#destroy" do
+    #認可されたユーザーとして
+    context "as an authorized user" do
+      before do
+        @user = FactoryBot.create(:user)
+        @project = FactoryBot.create(:project, owner: @user)
+      end
+      #プロジェクトを削除できること
+      it "deletes a project" do
+        project_params = FactoryBot.attributes_for(:project)
+        sign_in @user
+        expect {
+          delete project_url @project, params: { project: project_params }
+        }.to change(@user.projects, :count).by(-1)
+      end
+    end
+    #認可されていないユーザーとして
+    context "as an unauthorized user" do
+      before do
+        @user = FactoryBot.create(:user)
+        other_user = FactoryBot.create(:user)
+        @project = FactoryBot.create(:project, owner: other_user)
+      end
+      #プロジェクトを削除できないこと
+      it "does not delete the project" do
+        project_params = FactoryBot.attributes_for(:project)
+        sign_in @user
+        expect {
+          delete project_url @project, params: { project: project_params }
+        }.to_not change(Project, :count)
+      end
+      #ダッシュボードにリダイレクトすること
+      it "redirects to the dashboard" do
+        project_params = FactoryBot.attributes_for(:project)
+        sign_in @user
+        delete project_url @project, params: { project: project_params }
+        expect(response).to redirect_to root_path
+      end
+    end
+    #ゲストとして
+    context "as a guest" do
+      before do
+        @project = FactoryBot.create(:project)
+      end
+      #302レスポンスを返すこと
+      it "returns a 302 response" do
+        project_params = FactoryBot.attributes_for(:project)
+        delete project_url @project, params: { project: project_params }
+        expect(response).to have_http_status "302"
+      end
+      #サインイン画面にリダイレクトすること
+      it "redirects to the sign-in page" do
+        project_params = FactoryBot.attributes_for(:project)
+        delete project_url @project, params: { project: project_params }
+        expect(response).to redirect_to "/users/sign_in"
+      end
+      #プロジェクトを削除できないこと
+      it "does not delete the project" do
+        project_params = FactoryBot.attributes_for(:project)
+        expect {
+          delete project_url @project, params: { project: project_params }
+        }.to_not change(Project, :count)
+      end
+    end
   end
 end

@@ -10,7 +10,7 @@ RSpec.describe "Projects", type: :request do
       #正常にレスポンスを返すこと
       it "responds successfully returns a 200 response" do
         sign_in @user
-        get projects_url
+        get projects_path
         expect(response).to be_successful
         expect(response).to have_http_status "200"
       end
@@ -18,13 +18,13 @@ RSpec.describe "Projects", type: :request do
     #ゲストとして
     context "as a guest" do
       it "returns a 302 response" do
-        get projects_url
+        get projects_path
         expect(response).to have_http_status "302"
       end
 
       #サインイン画面にリダイレクトすること
       it "redirects to the sign-in page" do
-        get projects_url
+        get projects_path
         expect(response).to redirect_to "/users/sign_in"
       end
     end
@@ -39,7 +39,7 @@ RSpec.describe "Projects", type: :request do
       #正常にレスポンスを返すこと
       it "responds successfully returns a 200 response" do
         sign_in @user
-        get projects_url, params: { id: @project.id }
+        get projects_path, params: { id: @project.id }
         expect(response).to be_successful
       end
     end
@@ -73,7 +73,7 @@ RSpec.describe "Projects", type: :request do
           project_params = FactoryBot.attributes_for(:project)
           sign_in @user
           expect {
-            post projects_url, params: { project: project_params }
+            post projects_path, params: { project: project_params }
           }.to change(@user.projects, :count).by(1)
         end
       end
@@ -85,7 +85,7 @@ RSpec.describe "Projects", type: :request do
           project_params = FactoryBot.attributes_for(:project, :invalid)
           sign_in @user
           expect {
-            post projects_url, params: { project: project_params }
+            post projects_path, params: { project: project_params }
           }.to_not change(@user.projects, :count)
         end
       end
@@ -96,14 +96,14 @@ RSpec.describe "Projects", type: :request do
       #302レスポンスを返すこと
       it "returns a 302 response" do
         project_params = FactoryBot.attributes_for(:project)
-        post projects_url, params: { project: project_params }
+        post projects_path, params: { project: project_params }
         expect(response).to have_http_status "302"
       end
 
       #サインイン画面にリダイレクトすること
       it "redirects to the sign-in page" do
         project_params = FactoryBot.attributes_for(:project)
-        post projects_url, params: { project: project_params }
+        post projects_path, params: { project: project_params }
         expect(response).to redirect_to "/users/sign_in"
       end
     end
